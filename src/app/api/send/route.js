@@ -5,24 +5,30 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = process.env.FROM_EMAIL;
 
 export async function POST(req, res) {
-  const { email, subject, message } = await req.json();
-  console.log(email, subject, message);
   try {
+    console.log("Before JSON parse");
+    const { email, subject, message } = await req.json();
+    console.log("After JSON parse", email, subject, message);
+
     const data = await resend.emails.send({
-      from: 'deyanovva@gmail.com',
+      from: 'Vladimir <deyanovva@gmail.com>',
       to: ['deyanovva@gmail.com'],
-      subject: "WEBSITE FOLLOW UP",
+      subject: 'EMAIL FROM YOUR WEBSITE',
       react: (
         <>
           <h1>{subject}</h1>
-          <p>The email is sent!</p>
+          <p>Thank you for contacting me!</p>
           <p>New message submitted:</p>
           <p>{message}</p>
         </>
       ),
     });
+
+    console.log("After sending email", data);
+
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error });
+    console.error("Error in POST:", error);
+    return NextResponse.json({ error: error.message });
   }
 }
